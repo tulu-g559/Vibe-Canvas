@@ -2,6 +2,5 @@ Flask
 python-dotenv
 huggingface-hub
 Pillow
-pretty_midi
-mido
-note-seq>=0.0.5
+elevenlabs
+google-genearativeai
