@@ -4,6 +4,7 @@ from huggingface_hub import InferenceClient
 from PIL import Image
 from dotenv import load_dotenv
 from elevenlabs import ElevenLabs
+from flask_cors import CORS
 import google.generativeai as genai
 
 from io import BytesIO
@@ -12,6 +13,7 @@ from io import BytesIO
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 
 @app.route('/')
 def home():

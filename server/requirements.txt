@@ -3,4 +3,4 @@ python-dotenv
 huggingface-hub
 Pillow
 elevenlabs
-google-genearativeai
+google-generativeai
