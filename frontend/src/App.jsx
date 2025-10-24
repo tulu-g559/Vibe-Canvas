@@ -13,7 +13,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/generate-image" element={<GenerateImage />} />
-          <Route path="/generate-lyrics" element={<GenerateLyrics />} />
+          <Route path="/generate-poetry" element={<GenerateLyrics />} />
           <Route path="/lyrics-audio" element={<LyricsAudio />} />
         </Routes>
     </div>

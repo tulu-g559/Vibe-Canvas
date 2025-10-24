@@ -6,20 +6,17 @@ export default function Navbar() {
   const menuRef = useRef(null);
   const [height, setHeight] = useState(0);
   const [darkMode, setDarkMode] = useState(() => {
-    // Read saved preference from localStorage or default to system preference
     const storedMode = localStorage.getItem("theme");
     if (storedMode) return storedMode === "dark";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
-  // Animate dropdown height
   useEffect(() => {
     if (menuRef.current) {
       setHeight(isOpen ? menuRef.current.scrollHeight : 0);
     }
   }, [isOpen]);
 
-  // Apply dark mode to <html>
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -41,10 +38,8 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4 py-3 md:py-4">
-        {/* Logo Text only */}
         <h1 className="text-xl font-extrabold tracking-wide">Vibe Canvas</h1>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8">
           <Link className="hover:text-yellow-300 font-medium transition" to="/">
             Home
@@ -57,9 +52,9 @@ export default function Navbar() {
           </Link>
           <Link
             className="hover:text-yellow-300 font-medium transition"
-            to="/generate-lyrics"
+            to="/generate-poetry"
           >
-            Lyrics
+            Poetry
           </Link>
           <Link
             className="hover:text-yellow-300 font-medium transition"
@@ -68,14 +63,12 @@ export default function Navbar() {
             Audio
           </Link>
 
-          {/* Dark Mode Toggle */}
           <button
             onClick={toggleDarkMode}
             className="ml-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
             title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {darkMode ? (
-              // 🌙 Moon icon (Dark Mode)
               <svg
                 className="w-6 h-6 text-yellow-300"
                 fill="currentColor"
@@ -84,7 +77,6 @@ export default function Navbar() {
                 <path d="M21.64 13.04A9 9 0 0111 2a9 9 0 000 18 9 9 0 0010.64-6.96z" />
               </svg>
             ) : (
-              // 🌞 Sun icon (Light Mode)
               <svg
                 className="w-6 h-6 text-yellow-100"
                 fill="currentColor"
@@ -96,9 +88,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Controls */}
         <div className="md:hidden flex items-center space-x-3">
-          {/* Dark Mode Toggle */}
           <button
             onClick={toggleDarkMode}
             className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
@@ -123,7 +113,6 @@ export default function Navbar() {
             )}
           </button>
 
-          {/* Hamburger */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="focus:outline-none"
@@ -154,7 +143,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
       <div
         ref={menuRef}
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
@@ -178,11 +166,11 @@ export default function Navbar() {
             Image
           </Link>
           <Link
-            to="/generate-lyrics"
+            to="/generate-poetry"
             onClick={() => setIsOpen(false)}
             className="hover:text-yellow-300 transition"
           >
-            Lyrics
+            Poetry
           </Link>
           <Link
             to="/lyrics-audio"

@@ -9,7 +9,6 @@ export default function Home() {
       dark:from-gray-800 dark:via-gray-900 dark:to-gray-700
       transition-colors duration-500"
     >
-      {/* Background gradient overlay */}
       <div
         className="absolute top-0 left-0 w-full h-full opacity-50
         bg-linear-to-br from-pink-200 via-purple-200 to-blue-200
@@ -35,7 +34,6 @@ export default function Home() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-          {/* Generate Image */}
           <Link
             to="/generate-image"
             className="block rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1
@@ -55,9 +53,8 @@ export default function Home() {
             </p>
           </Link>
 
-          {/* Generate Lyrics */}
           <Link
-            to="/generate-lyrics"
+            to="/generate-poetry"
             className="block rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1
               bg-linear-to-r from-green-200 via-teal-200 to-cyan-200
               dark:from-gray-700 dark:via-gray-800 dark:to-gray-900
@@ -68,14 +65,13 @@ export default function Home() {
               text-gray-800 dark:text-gray-100
             "
             >
-              Generate Lyrics
+              Generate Poetry
             </h2>
             <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
-              Generate creative song lyrics or short poems based on your ideas.
+              Generate creative poetry based on your ideas.
             </p>
           </Link>
 
-          {/* Lyrics Audio */}
           <Link
             to="/lyrics-audio"
             className="block rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition transform hover:-translate-y-1

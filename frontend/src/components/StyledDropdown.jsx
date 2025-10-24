@@ -16,7 +16,6 @@ export default function StyledDropdown({ value, onChange, options, label }) {
         </label>
       )}
 
-      {/* Dropdown box */}
       <div
         onClick={() => setOpen(!open)}
         className={`p-3 w-full border rounded-xl shadow-sm cursor-pointer transition 
@@ -48,7 +47,6 @@ export default function StyledDropdown({ value, onChange, options, label }) {
         </div>
       </div>
 
-      {/* Dropdown list */}
       {open && (
         <div
           className="absolute mt-2 w-full border rounded-xl shadow-lg z-10 overflow-hidden 

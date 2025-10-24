@@ -7,6 +7,7 @@ export default function GenerateLyrics() {
   const [prompt, setPrompt] = useState("");
   const [mood, setMood] = useState("neutral");
   const [lyrics, setLyrics] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,9 +22,19 @@ export default function GenerateLyrics() {
     setError("");
     setLoading(true);
     setLyrics("");
+    setAudioUrl("");
     try {
-      console.log(mood);
       const res = await generateLyrics(prompt, mood);
+
+      if (res.audio_base64) {
+        const audioBytes = Uint8Array.from(atob(res.audio_base64), (c) =>
+          c.charCodeAt(0)
+        );
+        const blob = new Blob([audioBytes], { type: "audio/mpeg" });
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+      }
+
       setLyrics(res.lyrics);
     } catch (err) {
       setError("❌ Failed to generate lyrics. Please try again.");
@@ -50,7 +61,7 @@ export default function GenerateLyrics() {
       pt-16 pb-8 px-4 sm:px-6 md:px-12 transition-colors duration-500"
     >
       <Card
-        title="Generate Creative Lyrics"
+        title="Generate Creative Poetry"
         className="w-full max-w-xl sm:max-w-2xl md:max-w-4xl 
         bg-white/90 dark:bg-gray-900/70 
         text-gray-800 dark:text-gray-100 transition-all"
@@ -87,8 +98,12 @@ export default function GenerateLyrics() {
           hover:scale-105 transition text-sm sm:text-base"
           disabled={loading}
         >
-          {loading ? "Generating..." : "Generate Lyrics"}
+          {loading ? "Generating..." : "Generate Poetry"}
         </button>
+
+        {audioUrl && (
+          <audio controls src={audioUrl} className="w-full mt-4 rounded-lg" />
+        )}
 
         {lyrics && (
           <pre
