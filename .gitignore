@@ -1,2 +1,4 @@
 .env
 vc
+node_modules
+venv

@@ -4,30 +4,27 @@ from huggingface_hub import InferenceClient
 from PIL import Image
 from dotenv import load_dotenv
 from elevenlabs import ElevenLabs
+from flask_cors import CORS
 import google.generativeai as genai
-
 from io import BytesIO
+import base64
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Vibe Canvas server!"})
 
-
-# Hugging Face client for Stable Diffusion
+# ---------------------------
+# Hugging Face, Gemini, ElevenLabs clients
+# ---------------------------
 hf_client = InferenceClient(api_key=os.environ["HF_TOKEN"])
-# Initialize Gemini
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-# Initialize ElevenLabs client
 tts_client = ElevenLabs(api_key=os.environ["XI_API_KEY"])
-
-
-
-
 
 # ---------------------------
 # ROUTE 1: IMAGE GENERATION
@@ -52,13 +49,11 @@ def generate_image():
         return send_file(img_bytes, mimetype='image/png')
 
     except Exception as e:
-        # Return error details in JSON (so Postman sees why)
         return {"error": str(e)}, 500
 
-
-
-
-
+# ---------------------------
+# Helper: create lyrics text
+# ---------------------------
 def create_lyrics_text(user_prompt: str = None, mood: str = "neutral", lyrics_override: str = None) -> str:
     """
     Returns lyrics text.
@@ -79,42 +74,61 @@ def create_lyrics_text(user_prompt: str = None, mood: str = "neutral", lyrics_ov
     response = model.generate_content(gemini_prompt)
     return response.text.strip()
 
-
-# --- ROUTE: generate lyrics (uses helper) ---
+# ---------------------------
+# ROUTE 2: GENERATE LYRICS + AUDIO
+# ---------------------------
 @app.route("/generate_lyrics", methods=["POST"])
-def generate_lyrics():
+def generate_lyrics_with_audio():
     try:
         data = request.get_json(force=True)
         user_prompt = data.get("prompt", "")
         mood = data.get("mood", "neutral")
-        # allow caller to directly pass lyrics (optional)
-        lyrics_override = data.get("lyrics")
+        lyrics_override = data.get("lyrics")  # optional
 
-        lyrics_text = create_lyrics_text(user_prompt=user_prompt, mood=mood, lyrics_override=lyrics_override)
-        return jsonify({"lyrics": lyrics_text})
+        # Generate lyrics
+        lyrics_text = create_lyrics_text(
+            user_prompt=user_prompt,
+            mood=mood,
+            lyrics_override=lyrics_override
+        )
+
+        # Convert lyrics to audio (ElevenLabs)
+        audio_generator = tts_client.text_to_speech.convert(
+            text=lyrics_text,
+            voice_id="JBFqnCBsd6RMkjVDRZzb",  # Indian English voice
+            model_id="eleven_multilingual_v2",
+            output_format="mp3_44100_128"
+        )
+
+        # Convert audio generator to bytes
+        audio_bytes = b"".join(list(audio_generator))
+
+        # Encode audio as base64 to send in JSON
+        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+
+        # Return lyrics + audio
+        return jsonify({
+            "lyrics": lyrics_text,
+            "audio_base64": audio_base64
+        })
 
     except ValueError as ve:
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
-
 # ---------------------------
-# ROUTE 3: LYRICS / POETRY TTS
+# ROUTE 3: LYRICS AUDIO ONLY (UNCHANGED)
 # ---------------------------
 @app.route('/generate_lyrics_audio_from_prompt', methods=['POST'])
 def generate_lyrics_audio_from_prompt():
     try:
         data = request.get_json(force=True)
-        # Accept either full lyrics directly, or prompt+mood to generate lyrics
-        lyrics = data.get("lyrics")            # preferred: full lyrics text from /generate_lyrics
-        user_prompt = data.get("prompt", "")   # fallback if lyrics not provided
+        lyrics = data.get("lyrics")           
+        user_prompt = data.get("prompt", "")  
         mood = data.get("mood", "neutral")
 
-        # create_lyrics_text will use `lyrics` if provided, otherwise generate from prompt+mood
+
         lyrics_text = create_lyrics_text(user_prompt=user_prompt, mood=mood, lyrics_override=lyrics)
 
         # Convert lyrics to audio via ElevenLabs TTS
@@ -143,7 +157,8 @@ def generate_lyrics_audio_from_prompt():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
+# ---------------------------
+# RUN SERVER
+# ---------------------------
 if __name__ == "__main__":
     app.run(debug=True)
